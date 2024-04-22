@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BaseLib</string>
+    <string name="open_notification_setting_failed">打开应用设置页面失败,请手动进入应用详情设置</string>
+</resources>

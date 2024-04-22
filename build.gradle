@@ -1,0 +1,106 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    // 依赖插件脚本
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.alibaba.arouter' //提高 ARouter 的初始化速度
+}
+
+android {
+    compileSdkVersion build_versions.target_sdk
+    buildToolsVersion build_versions.build_tools
+
+    defaultConfig {
+//        applicationId "com.gdiwing.baselib"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+        buildConfigField "int", "VERSION_CODE", "${rootProject.ext.android.versionCode}"
+        buildConfigField "String", "VERSION_NAME", "\"${(rootProject.ext.android.versionName)}\""
+        //dex突破65535的限制
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        flavorDimensions "google"
+        manifestPlaceholders = [
+                app_name: "@string/app_name"
+        ]
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.getName())
+                arg("AROUTER_GENERATE_DOC", "enable")
+            }
+        }
+    }
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    configurations{
+        //        all*.exclude  module: 'MultiImageSelector'  //去除重复依赖库
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    viewBinding {
+        enabled = true
+    }
+    buildFeatures {
+        dataBinding true
+    }
+
+    productFlavors {
+        google {
+            manifestPlaceholders = [
+                    app_name: "@string/app_name"
+            ]
+        }
+    }
+}
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(include: ['*.jar', '*.aar'], dir: 'google-libs')
+
+    api "androidx.core:core-ktx:${deps.versions.kotlin_version}"
+    api "androidx.appcompat:appcompat:$deps.versions.appcompat"
+    api "com.google.android.material:material:$deps.versions.material"
+    api "androidx.constraintlayout:constraintlayout:$deps.versions.constraintlayout"
+    api "androidx.databinding:databinding-runtime:$deps.versions.databinding_runtime"
+    api 'androidx.activity:activity-ktx:1.5.1'//by viewModels
+    api 'androidx.fragment:fragment-ktx:1.5.2'//by viewModels
+    api 'com.blankj:utilcodex:1.30.0'
+    api deps.lifecycle_runtime_ktx
+    api deps.lifecycle_livedata_ktx
+    api deps.lifecycle_viewmodel_ktx
+    api deps.retrofit.runtime
+    api deps.retrofit.rxjava
+    api deps.retrofit.gson
+    api deps.rx_android2
+    api deps.okhttp.logging_interceptor
+    api deps.arouter.runtime
+    kapt deps.arouter.compiler
+    api deps.stetho.stetho
+    api deps.stetho.okhttp3
+    kapt deps.dagger.hilt_compiler
+    implementation deps.dagger.hilt_android
+    api deps.banner
+    api deps.indicator
+    api deps.flowlayout
+    api deps.toast
+    api deps.bugly.crashreport_upgrade
+    api deps.bugly.nativecrashreport
+
+//    debugImplementation deps.leakcanary
+    // 在 release 构建中排除 LeakCanary
+//    releaseImplementation ('com.squareup.leakcanary:leakcanary-android:2.9.1') {
+//        exclude group: 'com.squareup.leakcanary', module: 'leakcanary-android'
+//    }
+    testImplementation "junit:junit:$deps.versions.junit"
+    androidTestImplementation "androidx.test.ext:junit:$deps.versions.android_junit"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$deps.versions.espresso"
+}
